@@ -8,16 +8,19 @@ import shutil
 import datetime
 
 class Experiment_Recoding():
-    def __init__(self, target_folder, message, backup_list = ['config.py', 'model.py'], backup_file_path = None):
+    def __init__(self, target_folder, message, backup_list = ['config.py', 'model.py'], backup_file_path = None, is_continue = False):
         self.target_folder = target_folder # result folder
         self.msg = message # write message
         self.backup_lst = backup_list
         self.backup_file_path = backup_file_path
         
         # --- run --- #
-        self._check_and_create_folder()
-        self._write_msg_first()
-        self._copy_file()
+        if not is_continue:
+            self._check_and_create_folder()
+            self._write_msg_first()
+            self._copy_file()
+        else:
+            self._attach_file()
         
     def _check_and_create_folder(self):
         if os.path.exists(self.target_folder):
@@ -43,8 +46,13 @@ class Experiment_Recoding():
             f.write("Recording time: %s \n" % (current_time))
             f.write(self.msg + '\n')
         print("Write recording file to %s" % (self.rec_file))
+        
+    def _attach_file(self):
+        self.rec_file = os.path.join(self.target_folder, "msg.txt")
+        with open(self.rec_file, 'a') as f:
+            f.write("re-attach file" + "\n")
+        print('recording file attached: %s' % self.rec_file)
     
     def write_new_msg(self, msg):
         with open(self.rec_file, 'a') as f:
             f.write(msg + '\n')
-            
