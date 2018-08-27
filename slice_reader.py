@@ -5,7 +5,7 @@ from PIL import Image
 
 
 class SLIDE_OPENER():
-    def __init__(self, this_slide):
+    def __init__(self, this_slide, cv_filter_module = 'cv_contour'):
         """
         Initalize the slider viewer
         top level: largest level
@@ -13,6 +13,7 @@ class SLIDE_OPENER():
         """
         print("Reading whole slide image: %s" % this_slide)
         self.current_slide = open_slide(this_slide)
+        self.filter_method = cv_filter_module
         self.init_processing()
         open_level = 8
         n_full_patches = self.levels_dimension[open_level-1][0] * self.levels_dimension[open_level - 1][1] # we take the 8th level (due to process)
@@ -41,12 +42,20 @@ class SLIDE_OPENER():
                                             )
         tmp = np.array(tmp)
         self.im_gray = cv2.cvtColor(tmp, cv2.COLOR_RGB2GRAY)
-        
-        ret, thresh = cv2.threshold(self.im_gray, 127, 240, 1)
-        im_, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        
-        arr = cv2.drawContours(im_, contours, -1, color = (255), thickness = 4)
-        coordinate_bound = np.where(arr != 0)
+        if self.filter_method == 'cv_contour':
+            # Use filtering module
+            
+
+            ret, thresh = cv2.threshold(self.im_gray, 127, 240, 1)
+            im_, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+            arr = cv2.drawContours(im_, contours, -1, color = (255), thickness = 4)
+            coordinate_bound = np.where(arr != 0)
+        else:
+            # Skip filtering module
+            print("Skip filtering, use all patches")
+            arr = np.ones(self.im_gray.shape)
+            coordinate_bound = np.where(arr != 0)
         
         return arr, coordinate_bound
     

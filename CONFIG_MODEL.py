@@ -20,6 +20,7 @@ class PRETRAIN_MODEL_SETUP(object):
     
     # PATH TO ckpt file
     PRETRAIN_DICT = {'resnet_50': model_collection_path + '/resnet_v2_50/model.ckpt',
+                     'resnet_50_se': model_collection_path + '/resnet_v2_50/model.ckpt',
                  'resnet_101': model_collection_path + '/resnet_v2_101/model.ckpt',
                  'resnet_152': model_collection_path + '/resnet_v2_152/model.ckpt',
                  'inception_resnet': model_collection_path + '/inception_resnet_v2/model.ckpt',
@@ -30,6 +31,7 @@ class PRETRAIN_MODEL_SETUP(object):
     # image preprocessing function corresponding to each pre-train model
     CORRESPONDING_PREPROC = {
         'resnet_50': tf.keras.applications.resnet50.preprocess_input,
+        'resnet_50_se': tf.keras.applications.resnet50.preprocess_input,
         'resnet_101': tf.keras.applications.resnet50.preprocess_input,
         'resnet_152': tf.keras.applications.resnet50.preprocess_input,
         'inception_resnet': tf.keras.applications.inception_resnet_v2.preprocess_input,
