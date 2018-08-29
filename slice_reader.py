@@ -5,7 +5,7 @@ from PIL import Image
 
 
 class SLIDE_OPENER():
-    def __init__(self, this_slide, cv_filter_module = 'cv_contour'):
+    def __init__(self, this_slide, cv_filter_module = 'cv_contour', show_info = True):
         """
         Initalize the slider viewer
         top level: largest level
@@ -14,10 +14,12 @@ class SLIDE_OPENER():
         print("Reading whole slide image: %s" % this_slide)
         self.current_slide = open_slide(this_slide)
         self.filter_method = cv_filter_module
+        self.show_info = show_info
         self.init_processing()
         open_level = 8
         n_full_patches = self.levels_dimension[open_level-1][0] * self.levels_dimension[open_level - 1][1] # we take the 8th level (due to process)
-        print("Read done, #total candidate patches: %i out of total patches: %i" % (self.n_total_patch, n_full_patches))
+        if self.show_info:
+            print("Read done, #total candidate patches: %i out of total patches: %i" % (self.n_total_patch, n_full_patches))
         
     def init_processing(self):
         """
@@ -53,7 +55,8 @@ class SLIDE_OPENER():
             coordinate_bound = np.where(arr != 0)
         else:
             # Skip filtering module
-            print("Skip filtering, use all patches")
+            if self.show_info:
+                print("Skip filtering, use all patches")
             arr = np.ones(self.im_gray.shape)
             coordinate_bound = np.where(arr != 0)
         
