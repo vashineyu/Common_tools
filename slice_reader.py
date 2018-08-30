@@ -11,14 +11,15 @@ class SLIDE_OPENER():
         top level: largest level
         bottom level: detailed level
         """
-        print("Reading whole slide image: %s" % this_slide)
+        if show_info:
+            print("Reading whole slide image: %s" % this_slide)
         self.current_slide = open_slide(this_slide)
         self.filter_method = cv_filter_module
         self.show_info = show_info
         self.init_processing()
         open_level = 8
         n_full_patches = self.levels_dimension[open_level-1][0] * self.levels_dimension[open_level - 1][1] # we take the 8th level (due to process)
-        if self.show_info:
+        if show_info:
             print("Read done, #total candidate patches: %i out of total patches: %i" % (self.n_total_patch, n_full_patches))
         
     def init_processing(self):
