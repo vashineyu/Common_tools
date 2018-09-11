@@ -5,7 +5,7 @@ from PIL import Image
 
 
 class SLIDE_OPENER():
-    def __init__(self, this_slide, cv_filter_module = 'cv_contour', show_info = True):
+    def __init__(self, this_slide, cv_filter_module = 'cv_contour', show_info = True, do_init = True):
         """
         Initalize the slider viewer
         top level: largest level
@@ -16,6 +16,7 @@ class SLIDE_OPENER():
         self.current_slide = open_slide(this_slide)
         self.filter_method = cv_filter_module
         self.show_info = show_info
+        self.do_init = do_init
         self.init_processing()
         open_level = 8
         n_full_patches = self.levels_dimension[open_level-1][0] * self.levels_dimension[open_level - 1][1] # we take the 8th level (due to process)
@@ -31,9 +32,10 @@ class SLIDE_OPENER():
         self.numbers_of_levels = self.current_slide.level_count
         self.patch_size_of_levels = [2**i for i in range(self.numbers_of_levels)]
         self.levels_dimension = self.current_slide.level_dimensions
-        self.positive_array, coords = self._get_contour(top_level = 8)
-        self.h_coords, self.w_coords = coords
-        self.n_total_patch = len(self.h_coords)
+        if self.do_init:
+            self.positive_array, coords = self._get_contour(top_level = 8)
+            self.h_coords, self.w_coords = coords
+            self.n_total_patch = len(self.h_coords)
     
     def _get_contour(self, top_level=8):
         """
