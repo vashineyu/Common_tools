@@ -8,7 +8,7 @@ class logAUC(Callback):
     def __init__(self):
         return
     
-    def on_epoch_begin(self, epoch, logs = {}):
+    def on_train_begin(self, epoch, logs = {}):
         logs = logs or {}
         record_items = ["val_auc", "val_f1sc", "val_fp", "val_fn", "val_tp", "val_tn"]
         for i in record_items:
