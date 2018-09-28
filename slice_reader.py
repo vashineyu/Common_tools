@@ -180,3 +180,26 @@ class SLIDE_OPENER():
             plt.show()
         
         return interactive(display_image, index=IntSlider(min=0,max=self.n_total_patch-1,step=1,value=0))
+    
+    
+def get_patch_as_center(slider, coord, lvs, patch_size):
+    """
+    :Args
+        - slider: opened slide
+        - coord: coordinate at level0, when get lvs > 0, we'll make lv0 patch as center of other levels (w,h)
+        - lvs: level you wnat
+        - patch_size: level 0 patch size
+    :Returns
+        - array patch of target level with patch_size
+        
+    :Example
+        get_pt_0 = [150399.18696, 51234.42074]
+        a = get_patch_as_center(sli, get_pt_0, lvs=0, patch_size=(256,256))
+    """
+    if lvs == 0:
+        get_pt = [int(i) for i in coord]
+    else:
+        get_pt = [int(i+patch_size[0]//2)-(patch_size[0] * (2**lvs) // 2) for i in coord]
+        
+    arr = slider.current_slide.read_region(level = lvs, location = get_pt, size = patch_size)
+    return arr
