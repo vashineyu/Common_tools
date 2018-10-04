@@ -17,7 +17,7 @@ The following contents document the main purpose of each py the highlight/person
 <To be done>
 
 main function|purpose|description|highlight/most used function
--------------|------:|----------:|----------------------------:
+-------------|------|----------|----------------------------
 data_visualization | Visualization| Useful when check stacked images | img_combine: plot a stack of images into grid-like
 Recording | Documentation/Recording | Used to record experiment setting | Experiment_Recoding is a class for you to put experiment related configs/setting into a new folder.  
 result_summary | Visualization | Compute metric after your experiment done | pdml is a good package!
