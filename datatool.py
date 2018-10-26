@@ -13,14 +13,18 @@ class Memory_buffer():
         self.image_queue = deque(maxlen = queue_size)
         self.label_queue = deque(maxlen = queue_size)
         
-    def put_items(self, image_array, label_array, index_array):
+    def put_items(self, image_array, label_array, index_array, rnd_chance = 0.5):
         """
         image_array: should be a 4D array (batch, w, h, c)
         label_array: should be a 2D array (batch, one-hot)
         index_array: should be a 1D array of indexes that identify which image should be put into queue
+        rnd_chance: prob to keep data
         """
         random.shuffle(index_array)
         for i in index_array:
+            if np.random.rand() > rnd_chance:
+            # X% chance to keep data (prevent wrong data to contaminate training process)
+            # Make it higher if you beileve in your data
             self.image_queue.append(image_array[i])
             self.label_queue.append(label_array[i])
     
