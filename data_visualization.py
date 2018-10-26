@@ -93,3 +93,17 @@ def get_image_for_paper(original_image_object, prediction_map, IHC_map = None,
         
         mixed = np.vstack((r1, r2))
         return Image.fromarray(mixed.astype('uint8'))
+    
+def plot_mask_on_image(img, mask, color=[0, 255, 255], alpha=0.3):
+    '''Plot colorful masks on the image
+    img: cv2 image
+    mask: boolean array or np.where
+    color: BGR triplet [_, _, _]. Default: [0, 255, 255] is yellow
+    alpha: transparency. float [0, 1]
+    Ref: http://www.pyimagesearch.com/2016/03/07/transparent-overlays-with-opencv/
+    '''
+    out = img.copy()
+    img_layer = img.copy()
+    img_layer[mask] = color
+    out = cv2.addWeighted(img_layer, alpha, out, 1-alpha, 0, out)
+    return out
