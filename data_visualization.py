@@ -40,14 +40,14 @@ def img_combine(img, ncols=5, size=1, path=False):
         plt.tight_layout()
         plt.savefig(path, dpi = 300)
     plt.show()
-    
-    
-def get_image_for_paper(original_image_object, prediction_map, IHC_map = None, 
-                        overlay_alpha = 0.6, sigma_filter = 128,
-                        mix = False):
+
+
+def get_image_for_paper(original_image_object, prediction_map, IHC_map=None,
+                        activation_threshold=0.3, overlay_alpha=0.6, sigma_filter=128,
+                        mix=False, colormap_style="coolwarm"):
     """
     Get paper used images (raw, overlay_only, raw+overlay, IHC responding region)
-    
+
     Args:
         - original_image_object: PIL image obejct
         - prediction_map: Array of prediction
@@ -59,20 +59,26 @@ def get_image_for_paper(original_image_object, prediction_map, IHC_map = None,
         Tuple of PIL images
         - (raw, overlay, raw+overlay, IHC)
     """
-    
+
     # Prediction map filtering
-    pred_smooth = gaussian_filter(prediction_map, sigma = sigma_filter)
-    
+    if sigma_filter > 0:
+        pred_smooth = gaussian_filter(prediction_map, sigma=sigma_filter)
+    else:
+        pred_smooth = prediction_map
+
     # Create a overlap map
-    overlay = np.zeros((prediction_map.shape + (4,))) # (h,w) -> (h,w,4)
-    overlay[:, :, [0,1]] = 255 # RGB, [0,1] = Yellow
-    overlay[:, :, -1] = (pred_smooth * 255 * overlay_alpha)
-    overlay = overlay.astype('uint8')
-    overlay = Image.fromarray(overlay)
-    
+    cm = plt.get_cmap(colormap_style)
+    overlay = cm(pred_smooth) * 255
+    mr, mc = np.where(pred_smooth > activation_threshold)
+    nr, nc = np.where(pred_smooth < activation_threshold)
+    overlay[nr, nc, :] = 255
+    overlay[nr, nc, 3] = 0
+    overlay[mr, mc, 3] = pred_smooth[mr, mc] * 255 * overlay_alpha
+    overlay = Image.fromarray(overlay.astype('uint8'))
+
     # Render overlay to original image
     render = original_image_object.copy()
-    render.paste(im = overlay, box = (0,0), mask = overlay)
+    render.paste(im=overlay, box=(0, 0), mask=overlay)
 
     if not mix:
         return (original_image_object, overlay, render, IHC_map)
@@ -82,15 +88,15 @@ def get_image_for_paper(original_image_object, prediction_map, IHC_map = None,
         ---------------------
         raw+overlay | IHC
         """
-        sz = tuple([int(i/4) for i in original_image_object.size])
-        raw_arr = np.array(original_image_object.resize(sz)) # RGBA
-        overlay = np.array(overlay.resize(sz)) #RGBA
-        render = np.array(render.resize(sz)) # RGBA
+        sz = tuple([int(i / 4) for i in original_image_object.size])
+        raw_arr = np.array(original_image_object.resize(sz))  # RGBA
+        overlay = np.array(overlay.resize(sz))  # RGBA
+        render = np.array(render.resize(sz))  # RGBA
         IHC_map = np.array(IHC_map.resize(sz)) if IHC_map is not None else np.zeros((sz + (4,)))
-        
+
         r1 = np.hstack((raw_arr, overlay))
         r2 = np.hstack((render, IHC_map))
-        
+
         mixed = np.vstack((r1, r2))
         return Image.fromarray(mixed.astype('uint8'))
     
